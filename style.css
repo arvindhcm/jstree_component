@@ -1,0 +1,43 @@
+#tree ul {
+    list-style: none;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+}
+#tree ul {
+    overflow: hidden;
+    max-height: 1000px;
+    transition: max-height 0.5s ease;
+}
+
+#tree ul.collapsed {
+     max-height: 0px; 
+} 
+
+li[data-leaf="true"] > i.fa-square-caret-down{
+    display: none;
+}
+
+button[btn-type] {
+    background-color: #fff;
+    border: 1px solid #b5b5b5;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+    /* display: none; */
+}
+button[btn-type="edit"] {
+  margin-left: 2rem;
+}
+button[btn-type="edit"]:hover {
+    background-color: #51d4ff;
+    color: #fff;
+}
+
+button[btn-type="delete"]:hover {
+    background-color: orangered;
+    color: #fff;
+  }
+  
+
+/* #tree li:hover > button[btn-type] {
+    display: block;
+} */
