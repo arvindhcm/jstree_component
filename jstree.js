@@ -6,10 +6,11 @@
 var jsTree = (function () {
 
     var jsTreeObject = {
-        deselectionInProgress : false,
 
-        domSelector:{
-            searchField: null
+        deselectionInProgress: false,
+
+        domSelector: {
+            searchField: null,
         },
 
         getSelectableNode: function ({ name }) {
@@ -173,7 +174,7 @@ var jsTree = (function () {
 
             if (button.textContent == "Save") {
                 let editableField = li.querySelector("input[type='text']");
-                handleSave({ target: editableField });
+                jsTreeObject.handleSave({ target: editableField });
                 return
             }
 
@@ -181,7 +182,7 @@ var jsTree = (function () {
             let input = document.createElement("input");
             input.setAttribute("type", "text");
             input.value = label.textContent;
-            input.addEventListener("blur", handleSave);
+            input.addEventListener("blur", jsTreeObject.handleSave);
 
 
 
@@ -293,20 +294,18 @@ var jsTree = (function () {
 
             tree.appendChild(ul);
 
-          
         }
-
     }
-
-
-
 
     return {
         init: function (data, tree, searchField) {
+
             jsTreeObject.domSelector.searchField = searchField;
             jsTreeObject.bindEvent();
-            return jsTreeObject.buildTree(data, tree, searchField)
+            jsTreeObject.buildTree(data, tree, searchField);
+
         }
+
     }
 })();
 
