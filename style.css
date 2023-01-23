@@ -1,9 +1,7 @@
+
 #tree ul {
     list-style: none;
-    margin-bottom: 1rem;
     margin-top: 0.5rem;
-}
-#tree ul {
     overflow: hidden;
     max-height: 1000px;
     transition: max-height 0.5s ease;

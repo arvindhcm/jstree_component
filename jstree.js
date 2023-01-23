@@ -1,14 +1,11 @@
 
-// let fa_edit = document.querySelector("template.btn-edit").content.cloneNode(true);
-// let fa_delete = document.querySelector("template.btn-delete").content.cloneNode(true);
-// let fa_save = document.querySelector("template.btn-save").content.cloneNode(true);
-
 var jsTree = (function () {
 
     var jsTreeObject = {
 
         state : {
-            selectedNodes :[]
+            selectedNodes :[],
+            editingNode: false
         },
 
         deselectionInProgress: false,
@@ -179,8 +176,11 @@ var jsTree = (function () {
             if (button.textContent == "Save") {
                 let editableField = li.querySelector("input[type='text']");
                 jsTreeObject.handleSave({ target: editableField });
+                jsTreeObject.state.editingNode = false;
                 return
             }
+            button.setAttribute("editing", "true");
+            jsTreeObject.state.editingNode = true;
 
             let label = li.querySelector("label");
             let input = document.createElement("input");
@@ -205,6 +205,13 @@ var jsTree = (function () {
             let label = document.createElement("label");
             label.textContent = input.value;
             li.replaceChild(label, input);
+
+            jsTreeObject.state.editingNode = false;
+
+            document.querySelectorAll("button[btn-type].inline-block").forEach(elem=>{
+                 elem.classList.remove("inline-block");
+            });
+
         },
 
         handleDelete: function (e) {
@@ -275,6 +282,23 @@ var jsTree = (function () {
                     jsTreeObject.showNodeWithParent(node)
                 });
             }
+
+            document.onclick= function(e){
+                if(e.target.tagName == "BUTTON" || e.target.tagName == "INPUT" ){
+                    e.stopPropagation()
+                    return
+                }
+                else{
+                    document.querySelectorAll("button[btn-type].inline-block").forEach(elem=>{
+                         console.log(e.target.tagName);
+                         elem.classList.remove("inline-block");
+                    });
+                    if(jsTreeObject.state.editingNode){
+                        jsTreeObject.state.editingNode=  !jsTreeObject.state.editingNode;
+                        document.querySelector("button[editing]").click();
+                    }
+                }
+            }
         },
 
         setSelectedNodes: function(tree){
@@ -325,3 +349,7 @@ var jsTree = (function () {
 })();
 
 
+
+// let fa_edit = document.querySelector("template.btn-edit").content.cloneNode(true);
+// let fa_delete = document.querySelector("template.btn-delete").content.cloneNode(true);
+// let fa_save = document.querySelector("template.btn-save").content.cloneNode(true);
