@@ -7,6 +7,10 @@ var jsTree = (function () {
 
     var jsTreeObject = {
 
+        state : {
+            selectedNodes :[]
+        },
+
         deselectionInProgress: false,
 
         domSelector: {
@@ -273,6 +277,14 @@ var jsTree = (function () {
             }
         },
 
+        setSelectedNodes: function(tree){
+            jsTreeObject.state.selectedNodes = tree.querySelectorAll('input[type=checkbox]:checked');
+        },
+
+        getSelectedNodes: function(tree){
+            return tree.querySelectorAll('input[type=checkbox]:checked');
+        },
+
         buildTree: function (data, tree, searchField) {
             let ul = document.createElement("ul");
 
@@ -304,6 +316,9 @@ var jsTree = (function () {
             jsTreeObject.bindEvent();
             jsTreeObject.buildTree(data, tree, searchField);
 
+        },
+        getSelectedNodes: function(tree){
+            return jsTreeObject.getSelectedNodes(tree);
         }
 
     }
