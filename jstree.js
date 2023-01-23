@@ -1,90 +1,4 @@
-let data = {
-    name: "Root",
-    children: [
-        {
-            name: "Cars",
-            children: [
-                {
-                    name: "Ferrari",
-                    children: [
-                        {
-                            name: "red",
-                            children: [
-                                {
-                                    name: "fr Roma",
-                                },
-                                {
-                                    name: "fr Italia",
-                                }
-                            ]
-                        },
-                        {
-                            name: "yellow",
-                        }
-                    ]
-                },
-                {
-                    name: "Mclaren",
-                    children: [
-                        {
-                            name: "mL1",
-                        },
-                        {
-                            name: "mL2",
-                        }
-                    ]
-                },
-                {
-                    name: "Mazda",
-                    children: [
-                        {
-                            name: "mx1",
-                        },
-                        {
-                            name: "mx5",
-                        }
-                    ]
-                },
-            ]
-        },
-        {
-            name: "Bikes",
-            children: [
-                {
-                    name: "Kawasaki",
-                    children: [
-                        {
-                            name: "ninja600",
-                        },
-                        {
-                            name: "ninja1000",
-                            children : [
-                                {
-                                    name:'type_first'
-                                },
-                                {
-                                    name:'type_second'
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    name: "Ducati",
-                    children: [
-                        {
-                            name: "D1",
-                        },
-                        {
-                            name: "D2",
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-};
-
+let data = { name: "Root", children: [ { name: "Cars", children: [ { name: "Ferrari", children: [ { name: "red", children: [ { name: "fr Roma", }, { name: "fr Italia", } ] }, { name: "yellow", } ] }, { name: "Mclaren", children: [ { name: "mL1", }, { name: "mL2", } ] }, { name: "Mazda", children: [ { name: "mx1", }, { name: "mx5", } ] }, ] }, { name: "Bikes", children: [ { name: "Kawasaki", children: [ { name: "ninja600", }, { name: "ninja1000", children : [ { name:'type_first' }, { name:'type_second' } ] } ] }, { name: "Ducati", children: [ { name: "D1", }, { name: "D2", } ] } ] } ] };
 let deselectionInProgress = false;
 
 let fa_edit =  document.querySelector("template.btn-edit").content.cloneNode(true);
@@ -135,6 +49,11 @@ let fa_save =  document.querySelector("template.btn-save").content.cloneNode(tru
 
      li.insertBefore(checkbox, li.firstChild);
      li.insertBefore(dropdownArrow, li.firstChild);
+
+     li.setAttribute("draggable", "true");
+     li.addEventListener("dragstart", handleDragStart);
+     li.addEventListener("dragover", handleDragOver);
+     li.addEventListener("drop", handleDrop);
 
      return li
 
@@ -286,7 +205,38 @@ function handleDelete(e) {
     let ul = li.parentNode;
     ul.removeChild(li);
 }
+function handleDrop(e) {
+    e.preventDefault();
+    let targetLi = e.target;
+    while (targetLi.tagName !== "LI") {
+        targetLi = targetLi.parentNode;
+    }
+    let sourceLi = document.querySelector("[dragging=true]");
+    if (targetLi.parentNode !== sourceLi.parentNode) {
+        sourceLi.removeAttribute("dragging");
+        return;
+    }
+    let sourceParent = sourceLi.parentNode;
+    let targetParent = targetLi.parentNode;
+    let sourceIndex = Array.prototype.indexOf.call(sourceParent.children, sourceLi);
+    let targetIndex = Array.prototype.indexOf.call(targetParent.children, targetLi);
+    if (sourceIndex < targetIndex) {
+        targetParent.insertBefore(sourceLi, targetLi.nextSibling);
+    } else {
+        targetParent.insertBefore(sourceLi, targetLi);
+    }
+    sourceLi.removeAttribute("dragging");
+}
+function handleDragStart(e) {
+    let li = e.target;
+    li.setAttribute("dragging","true");
+    e.dataTransfer.effectAllowed = "move";
+}
 
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+}
 searchField.oninput = function({target}) {
     let searchTerm = (target.value);
 
