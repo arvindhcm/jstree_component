@@ -1,277 +1,313 @@
-let data = { name: "Root", children: [ { name: "Cars", children: [ { name: "Ferrari", children: [ { name: "red", children: [ { name: "fr Roma", }, { name: "fr Italia", } ] }, { name: "yellow", } ] }, { name: "Mclaren", children: [ { name: "mL1", }, { name: "mL2", } ] }, { name: "Mazda", children: [ { name: "mx1", }, { name: "mx5", } ] }, ] }, { name: "Bikes", children: [ { name: "Kawasaki", children: [ { name: "ninja600", }, { name: "ninja1000", children : [ { name:'type_first' }, { name:'type_second' } ] } ] }, { name: "Ducati", children: [ { name: "D1", }, { name: "D2", } ] } ] } ] };
-let deselectionInProgress = false;
 
-let fa_edit =  document.querySelector("template.btn-edit").content.cloneNode(true);
-let fa_delete =  document.querySelector("template.btn-delete").content.cloneNode(true);
-let fa_save =  document.querySelector("template.btn-save").content.cloneNode(true);
+// let fa_edit = document.querySelector("template.btn-edit").content.cloneNode(true);
+// let fa_delete = document.querySelector("template.btn-delete").content.cloneNode(true);
+// let fa_save = document.querySelector("template.btn-save").content.cloneNode(true);
 
- getSelectableNode = (child) => {
+var jsTree = (function () {
 
-    
-    let li = document.createElement("li");
+    var jsTreeObject = {
+        deselectionInProgress : false,
 
-    let label = document.createElement("label");
-    li.setAttribute("name",child.name);
+        domSelector:{
+            searchField: null
+        },
 
-    label.textContent = child.name;
-    li.appendChild(label);
+        getSelectableNode: function ({ name }) {
 
-     let checkbox = document.createElement("input");
-     checkbox.setAttribute("type","checkbox");
-     checkbox.setAttribute("name",child.name);
-     checkbox.setAttribute("value", child.name);
-     checkbox.addEventListener("change", handleSelection);
+            let nodeName = name;
+            let li = document.createElement("li");
 
-     let editButton = document.createElement("button");
-     editButton.textContent = "Edit";
-     editButton.setAttribute("btn-type","edit")
-     editButton.addEventListener("click", handleEdit);
-    //  let fa_edit=  document.querySelector("template.btn-edit").content.cloneNode(true);
-    //  editButton.appendChild(fa_edit);
+            let label = document.createElement("label");
+            li.setAttribute("name", nodeName.toLowerCase());
 
-     li.appendChild(editButton);
+            label.textContent = nodeName;
+            li.appendChild(label);
 
-     let deleteButton = document.createElement("button");
-     deleteButton.textContent = "Delete";
-     deleteButton.setAttribute("btn-type","delete")
-     deleteButton.addEventListener("click", handleDelete);
-     
-    //  let fa_delete =  document.querySelector("template.btn-delete").content.cloneNode(true);
-    //  deleteButton.appendChild(fa_delete);
+            let checkbox = document.createElement("input");
+            checkbox.setAttribute("type", "checkbox");
+            checkbox.setAttribute("name", nodeName);
+            checkbox.setAttribute("value", nodeName);
+            checkbox.addEventListener("change", jsTreeObject.handleSelection);
 
-     li.appendChild(deleteButton);
+            let editButton = document.createElement("button");
+            editButton.textContent = "Edit";
+            editButton.setAttribute("btn-type", "edit")
+            editButton.addEventListener("click", jsTreeObject.handleEdit);
+            //  let fa_edit=  document.querySelector("template.btn-edit").content.cloneNode(true);
+            //  editButton.appendChild(fa_edit);
 
-     li.insertBefore(checkbox, li.firstChild);
+            li.appendChild(editButton);
 
-     let dropdownArrow = document.createElement("i");
-     dropdownArrow.classList.add("fa-regular","fa-square-caret-down");
-     dropdownArrow.addEventListener("click", handleCollapse)
+            let deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.setAttribute("btn-type", "delete")
+            deleteButton.addEventListener("click", jsTreeObject.handleDelete);
 
-     li.insertBefore(checkbox, li.firstChild);
-     li.insertBefore(dropdownArrow, li.firstChild);
+            //  let fa_delete =  document.querySelector("template.btn-delete").content.cloneNode(true);
+            //  deleteButton.appendChild(fa_delete);
 
-     li.setAttribute("draggable", "true");
-     li.addEventListener("dragstart", handleDragStart);
-     li.addEventListener("dragover", handleDragOver);
-     li.addEventListener("drop", handleDrop);
+            li.appendChild(deleteButton);
 
-     return li
+            // let options = document.createElement("span");
+            // options.appendChild(editButton);
+            // options.appendChild(deleteButton);
+            // li.appendChild(options);
 
-}
 
-function handleCollapse(e) {
-    let li = e.target.parentNode;
-    let ul = li.querySelector("ul");
-    if (ul) {
-        ul.classList.toggle("collapsed");
-    }
-}
+            let dropdownArrow = document.createElement("i");
+            dropdownArrow.classList.add("fa-solid", "fa-angle-down");
+            dropdownArrow.addEventListener("click", jsTreeObject.handleCollapse)
 
-function selecAllChild(ul){
-    for (let i = 0; i < ul.children.length; i++) {
-        ul.children[i].querySelector("input[type=checkbox]").checked = true;
-        let childUl =  ul.children[i].querySelector("ul")
-        if(childUl){
-            selecAllChild(childUl)
-        }
-    }
-}
 
-function deselecAllChild(ul){
-    for (let i = 0; i < ul.children.length; i++) {
-        ul.children[i].querySelector("input[type=checkbox]").checked = false;
-        let childUl =  ul.children[i].querySelector("ul")
-        if(childUl){
-            deselecAllChild(childUl)
-        }
-    }
-}
+            let dragHandler = document.createElement("i");
+            dragHandler.classList.add("fa-solid", "fa-grip");
 
-function handleSelection(e) {
-    let checkbox = e.target;
-    let li = checkbox.parentNode;
-    let ul = li.parentNode;
-    let parentCheckbox = (ul.parentNode).querySelector("input[type=checkbox]");
-    let childUl = li.querySelector("ul");
+            li.insertBefore(checkbox, li.firstChild);
+            li.insertBefore(dragHandler, li.firstChild);
+            li.insertBefore(dropdownArrow, li.firstChild);
 
-    if (checkbox.checked) {
-        let allChildrenChecked = true;
-        for (let i = 0; i < ul.children.length; i++) {
-            if (!ul.children[i].querySelector("input[type=checkbox]").checked) {
-                allChildrenChecked = false;
-                break;
+
+            li.setAttribute("draggable", "true");
+            li.addEventListener("dragstart", jsTreeObject.handleDragStart);
+            li.addEventListener("dragover", jsTreeObject.handleDragOver);
+            li.addEventListener("drop", jsTreeObject.handleDrop);
+
+            li.addEventListener("contextmenu", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation()
+                let btns = e.target.querySelectorAll("button[btn-type]");
+                btns.forEach((elem, idx) => {
+                    if (idx > 1) {
+                        return
+                    }
+                    elem.classList.add("inline-block");
+                })
+            }, false)
+
+            return li
+
+        },
+
+        handleCollapse: function (e) {
+            let li = e.target.parentNode;
+            let ul = li.querySelector("ul");
+            if (ul) {
+                ul.classList.toggle("collapsed");
             }
-        }
+        },
 
-        if(childUl){
-            selecAllChild(childUl);
-        }
-
-        if (allChildrenChecked && parentCheckbox) {
-            parentCheckbox.checked = true;
-             handleSelection({ target: parentCheckbox });
-        }
-    } else {
-        if (!deselectionInProgress && parentCheckbox) {
-            deselectionInProgress = true;
-            parentCheckbox.checked = false;
-
-            if(childUl){
-                deselecAllChild(childUl);
+        selecAllChild: function (ul) {
+            for (let i = 0; i < ul.children.length; i++) {
+                ul.children[i].querySelector("input[type=checkbox]").checked = true;
+                let childUl = ul.children[i].querySelector("ul")
+                if (childUl) {
+                    jsTreeObject.selecAllChild(childUl)
+                }
             }
-            handleSelection({ target: parentCheckbox });
-            deselectionInProgress = false;
+        },
+
+        deselecAllChild: function (ul) {
+            for (let i = 0; i < ul.children.length; i++) {
+                ul.children[i].querySelector("input[type=checkbox]").checked = false;
+                let childUl = ul.children[i].querySelector("ul")
+                if (childUl) {
+                    jsTreeObject.deselecAllChild(childUl)
+                }
+            }
+        },
+
+        handleSelection: function (e) {
+            let checkbox = e.target;
+            let li = checkbox.parentNode;
+            let ul = li.parentNode;
+            let parentCheckbox = (ul.parentNode).querySelector("input[type=checkbox]");
+            let childUl = li.querySelector("ul");
+
+            if (checkbox.checked) {
+                let allChildrenChecked = true;
+                for (let i = 0; i < ul.children.length; i++) {
+                    if (!ul.children[i].querySelector("input[type=checkbox]").checked) {
+                        allChildrenChecked = false;
+                        break;
+                    }
+                }
+
+                if (childUl) {
+                    jsTreeObject.selecAllChild(childUl);
+                }
+
+                if (allChildrenChecked && parentCheckbox) {
+                    parentCheckbox.checked = true;
+                    jsTreeObject.handleSelection({ target: parentCheckbox });
+                }
+            } else {
+                if (!jsTreeObject.deselectionInProgress && parentCheckbox) {
+                    jsTreeObject.deselectionInProgress = true;
+                    parentCheckbox.checked = false;
+
+                    if (childUl) {
+                        jsTreeObject.deselecAllChild(childUl);
+                    }
+                    jsTreeObject.handleSelection({ target: parentCheckbox });
+                    jsTreeObject.deselectionInProgress = false;
+                }
+            }
+
+        },
+
+
+        showNodeWithParent: function (node_one) {
+            node_one.style.display = "block";
+
+            let closestParentLi = node_one.parentNode.closest("li");
+            if (closestParentLi) {
+                jsTreeObject.showNodeWithParent(closestParentLi);
+            }
+        },
+
+        handleEdit: function (e) {
+
+            let button = e.target;
+            let li = button.parentNode;
+
+            if (button.textContent == "Save") {
+                let editableField = li.querySelector("input[type='text']");
+                handleSave({ target: editableField });
+                return
+            }
+
+            let label = li.querySelector("label");
+            let input = document.createElement("input");
+            input.setAttribute("type", "text");
+            input.value = label.textContent;
+            input.addEventListener("blur", handleSave);
+
+
+
+            li.replaceChild(input, label);
+
+            button.textContent = "Save";
+            // button.appendChild(fa_save)
+        },
+
+        handleSave: function (e) {
+            let input = e.target;
+            let li = input.parentNode;
+            li.querySelector("button[btn-type='edit']").textContent = "Edit";
+            // li.querySelector("button[btn-type='edit']").appendChild(fa_edit);
+
+            let label = document.createElement("label");
+            label.textContent = input.value;
+            li.replaceChild(label, input);
+        },
+
+        handleDelete: function (e) {
+            let button = e.target;
+            let li = button.parentNode;
+            let ul = li.parentNode;
+            ul.removeChild(li);
+        },
+
+
+        handleDrop: function (e) {
+            e.preventDefault();
+            let targetLi = e.target;
+            targetLi.setAttribute("dropping", "true");
+
+            while (targetLi.tagName !== "LI") {
+                targetLi = targetLi.parentNode;
+            }
+            let sourceLi = document.querySelector("[dragging=true]");
+
+            if (!sourceLi || targetLi.parentNode !== sourceLi.parentNode) {      // will reorder only between sibling of same parent
+
+                sourceLi && sourceLi.removeAttribute("dragging");
+                targetLi && targetLi.removeAttribute("dropping");
+                return;
+            }
+            let sourceParent = sourceLi.parentNode;
+            let targetParent = targetLi.parentNode;
+            let sourceIndex = Array.prototype.indexOf.call(sourceParent.children, sourceLi);
+            let targetIndex = Array.prototype.indexOf.call(targetParent.children, targetLi);
+            if (sourceIndex < targetIndex) {
+                targetParent.insertBefore(sourceLi, targetLi.nextSibling);
+            } else {
+                targetParent.insertBefore(sourceLi, targetLi);
+            }
+            sourceLi && sourceLi.removeAttribute("dragging");
+            targetLi && targetLi.removeAttribute("dropping");
+        },
+
+        handleDragStart: function (e) {
+            let li = e.target;
+            li.setAttribute("dragging", "true");
+            e.dataTransfer.effectAllowed = "copyMove";
+        },
+
+        handleDragOver: function (e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "copy";
+        },
+        bindEvent: function () {
+            jsTreeObject.domSelector.searchField.oninput = function ({ target }) {
+                let searchTerm = (target.value);
+
+
+                let matchedNodes = document.querySelectorAll(`#tree li[name*='${searchTerm}']`);
+                let unMatchedNodes = document.querySelectorAll(`#tree li:not([name^='${searchTerm}'])`);
+
+                if (!searchTerm) {
+                    document.querySelectorAll(`#tree li`).forEach(el => el.style.display = "block");
+                    return
+                }
+
+                unMatchedNodes.forEach(function (node) {
+                    node.style.display = "none";
+                });
+
+                matchedNodes.forEach(function (node) {
+                    jsTreeObject.showNodeWithParent(node)
+                });
+            }
+        },
+
+        buildTree: function (data, tree, searchField) {
+            let ul = document.createElement("ul");
+
+            data.children.forEach(function (child) {
+
+                li = jsTreeObject.getSelectableNode(child);
+
+                ul.appendChild(li);
+
+                if (!child.children) {
+                    li.setAttribute("data-leaf", "true")
+                }
+
+                if (child.children) {
+                    jsTreeObject.buildTree(child, li);
+                }
+
+            });
+
+            tree.appendChild(ul);
+
+          
+        }
+
+    }
+
+
+
+
+    return {
+        init: function (data, tree, searchField) {
+            jsTreeObject.domSelector.searchField = searchField;
+            jsTreeObject.bindEvent();
+            return jsTreeObject.buildTree(data, tree, searchField)
         }
     }
-
-}
-
-
-function buildTree(node, tree) {
-    let ul = document.createElement("ul");
-
-    node.children.forEach(function(child) {
-      
-        li = getSelectableNode(child);
-
-        ul.appendChild(li);
-
-        if(!child.children){
-            li.setAttribute("data-leaf","true")
-        }
-
-        if (child.children) {
-            buildTree(child, li);
-        }
-
-    });
-
-    tree.appendChild(ul);
-}
-
-let tree = document.getElementById("tree");
-let searchField =  document.getElementById("searchField");
-buildTree(data, tree);
+})();
 
 
-function showNodeWithParent(node){
-    node.style.display = "block";
-
-    let closestParentLi = node.parentNode.closest("li");
-    if(closestParentLi){
-        showNodeWithParent(closestParentLi);
-    }
-}
-
-function handleEdit(e) {
-
-    let button = e.target;
-    let li = button.parentNode;
-    
-    if(button.textContent == "Save"){
-        let editableField = li.querySelector("input[type='text']");
-        handleSave({target:editableField});
-        return
-    }
-
-    let label = li.querySelector("label");
-    let input = document.createElement("input");
-    input.setAttribute("type","text");
-    input.value = label.textContent;
-    input.addEventListener("blur", handleSave);
-    
-
-
-    li.replaceChild(input, label);
-
-    button.textContent = "Save"; 
-    // button.appendChild(fa_save)
-}
-
-function handleSave(e) {
-    let input = e.target;
-    let li = input.parentNode;
-    li.querySelector("button[btn-type='edit']").textContent = "Edit";
-    // li.querySelector("button[btn-type='edit']").appendChild(fa_edit);
-
-    let label = document.createElement("label");
-    label.textContent = input.value;
-    li.replaceChild(label, input);
-}
-
-function handleDelete(e) {
-    let button = e.target;
-    let li = button.parentNode;
-    let ul = li.parentNode;
-    ul.removeChild(li);
-}
-function handleDrop(e) {
-    e.preventDefault();
-    let targetLi = e.target;
-    while (targetLi.tagName !== "LI") {
-        targetLi = targetLi.parentNode;
-    }
-    let sourceLi = document.querySelector("[dragging=true]");
-    if (targetLi.parentNode !== sourceLi.parentNode) {
-        sourceLi.removeAttribute("dragging");
-        return;
-    }
-    let sourceParent = sourceLi.parentNode;
-    let targetParent = targetLi.parentNode;
-    let sourceIndex = Array.prototype.indexOf.call(sourceParent.children, sourceLi);
-    let targetIndex = Array.prototype.indexOf.call(targetParent.children, targetLi);
-    if (sourceIndex < targetIndex) {
-        targetParent.insertBefore(sourceLi, targetLi.nextSibling);
-    } else {
-        targetParent.insertBefore(sourceLi, targetLi);
-    }
-    sourceLi.removeAttribute("dragging");
-}
-function handleDragStart(e) {
-    let li = e.target;
-    li.setAttribute("dragging","true");
-    e.dataTransfer.effectAllowed = "move";
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-}
-searchField.oninput = function({target}) {
-    let searchTerm = (target.value);
-
-   
-    let matchedNodes = document.querySelectorAll(`#tree li[name*='${searchTerm}']`);   /**  optimized search */ 
-    let unMatchedNodes = document.querySelectorAll(`#tree li:not([name^='${searchTerm}'])`);
-
-    if(!searchTerm){
-            document.querySelectorAll(`#tree li`).forEach(el => el.style.display = "block");
-            return
-    }
-
-    unMatchedNodes.forEach(function(node) { 
-        node.style.display = "none";
-    });
-
-    matchedNodes.forEach(function(node) {
-        showNodeWithParent(node)
-    });
-    
-
-
-    // let treeNodes = document.querySelectorAll("#tree li");
-    // treeNodes.forEach(function(node) {
-    //     if (node.textContent.toLowerCase().includes(searchTerm.toLowerCase())) {      /**  unoptimized search */
-    //         node.style.display = "block";
-    //     } else {
-    //         node.style.display = "none";
-    //     }
-    // });
-};
-
-// document.addEventListener("click","i",function(e){
-//     e.stopPropagation();
-//     e.preventDefault();
-
-//     return false
-// })

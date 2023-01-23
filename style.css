@@ -8,36 +8,57 @@
     max-height: 1000px;
     transition: max-height 0.5s ease;
 }
+#tree li{
+    padding: 0.2rem;
+}
+#tree li > *{
+    margin-right: 0.5rem;
+
+}
+#tree li[dragging="true"]{
+    border: 1px solid #0086b2;
+    border-radius: 3px;
+    background-color: #eef2fb;
+    cursor: move;
+}
+#tree .fa-grip:hover,li[dragging="true"]:active{
+    cursor: move;
+}
 
 #tree ul.collapsed {
      max-height: 0px; 
 } 
 
-li[data-leaf="true"] > i.fa-square-caret-down{
+#tree li[data-leaf="true"] > i.fa-angle-down{
     display: none;
 }
 
-button[btn-type] {
+#tree button[btn-type] {
     background-color: #fff;
     border: 1px solid #b5b5b5;
     border-radius: 3px;
     margin-right: 0.5rem;
     /* display: none; */
 }
-button[btn-type="edit"] {
+#tree button[btn-type="edit"] {
   margin-left: 2rem;
 }
-button[btn-type="edit"]:hover {
+#tree button[btn-type="edit"]:hover {
     background-color: #51d4ff;
     color: #fff;
 }
 
-button[btn-type="delete"]:hover {
+#tree button[btn-type="delete"]:hover {
     background-color: orangered;
     color: #fff;
   }
   
 
-/* #tree li:hover > button[btn-type] {
-    display: block;
-} */
+#tree li > button[btn-type] {
+    display: none;
+}
+
+.inline-block{
+    display: inline-block !important;
+}
+
