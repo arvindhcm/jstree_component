@@ -1,58 +1,58 @@
 
-#tree ul {
+.jstree ul {
     list-style: none;
     margin-top: 0.5rem;
     overflow: hidden;
     max-height: 1000px;
     transition: max-height 0.5s ease;
 }
-#tree li{
+.jstree li{
     padding: 0.2rem;
 }
-#tree li > *{
+.jstree li > *{
     margin-right: 0.5rem;
 
 }
-#tree li[dragging="true"]{
+.jstree li[dragging="true"]{
     border: 1px solid #0086b2;
     border-radius: 3px;
     background-color: #eef2fb;
     cursor: move;
 }
-#tree .fa-grip:hover,li[dragging="true"]:active{
+.jstree .fa-grip:hover,li[dragging="true"]:active{
     cursor: move;
 }
 
-#tree ul.collapsed {
+.jstree ul.collapsed {
      max-height: 0px; 
 } 
 
-#tree li[data-leaf="true"] > i.fa-angle-down{
+.jstree li[data-leaf="true"] > i.fa-angle-down{
     display: none;
 }
 
-#tree button[btn-type] {
+.jstree button[btn-type] {
     background-color: #fff;
     border: 1px solid #b5b5b5;
     border-radius: 3px;
     margin-right: 0.5rem;
     /* display: none; */
 }
-#tree button[btn-type="edit"] {
+.jstree button[btn-type="edit"] {
   margin-left: 2rem;
 }
-#tree button[btn-type="edit"]:hover {
+.jstree button[btn-type="edit"]:hover {
     background-color: #51d4ff;
     color: #fff;
 }
 
-#tree button[btn-type="delete"]:hover {
+.jstree button[btn-type="delete"]:hover {
     background-color: orangered;
     color: #fff;
   }
   
 
-#tree li > button[btn-type] {
+.jstree li > button[btn-type] {
     display: none;
 }
 

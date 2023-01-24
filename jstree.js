@@ -3,8 +3,8 @@ var jsTree = (function () {
 
     var jsTreeObject = {
 
-        state : {
-            selectedNodes :[],
+        state: {
+            selectedNodes: [],
             editingNode: false
         },
 
@@ -12,6 +12,7 @@ var jsTree = (function () {
 
         domSelector: {
             searchField: null,
+            tree:null
         },
 
         getSelectableNode: function ({ name }) {
@@ -208,8 +209,8 @@ var jsTree = (function () {
 
             jsTreeObject.state.editingNode = false;
 
-            document.querySelectorAll("button[btn-type].inline-block").forEach(elem=>{
-                 elem.classList.remove("inline-block");
+            document.querySelectorAll("button[btn-type].inline-block").forEach(elem => {
+                elem.classList.remove("inline-block");
             });
 
         },
@@ -283,33 +284,63 @@ var jsTree = (function () {
                 });
             }
 
-            document.onclick= function(e){
-                if(e.target.tagName == "BUTTON" || e.target.tagName == "INPUT" ){
+            document.onclick = function (e) {
+                if (e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") {
                     e.stopPropagation()
                     return
                 }
-                else{
-                    document.querySelectorAll("button[btn-type].inline-block").forEach(elem=>{
-                         console.log(e.target.tagName);
-                         elem.classList.remove("inline-block");
+                else {
+                    document.querySelectorAll("button[btn-type].inline-block").forEach(elem => {
+                        console.log(e.target.tagName);
+                        elem.classList.remove("inline-block");
                     });
-                    if(jsTreeObject.state.editingNode){
-                        jsTreeObject.state.editingNode=  !jsTreeObject.state.editingNode;
+                    if (jsTreeObject.state.editingNode) {
+                        jsTreeObject.state.editingNode = !jsTreeObject.state.editingNode;
                         document.querySelector("button[editing]").click();
                     }
                 }
             }
         },
 
-        setSelectedNodes: function(tree){
-            jsTreeObject.state.selectedNodes = tree.querySelectorAll('input[type=checkbox]:checked');
+        setSelectedNodes: function () {
+            jsTreeObject.state.selectedNodes = jsTreeObject.domSelector.querySelectorAll('input[type=checkbox]:checked');
         },
 
-        getSelectedNodes: function(tree){
-            return tree.querySelectorAll('input[type=checkbox]:checked');
+        getSelectedNodes: function () {
+            return jsTreeObject.domSelector.querySelectorAll('input[type=checkbox]:checked');
+        },
+        getUpdatedDataFromDOM: function () {
+            
+            let getLiFromUl = function (ul) {
+
+                let children = []
+                Array.from(ul.children).forEach(function (li) {
+
+                    let x = {};
+                    x.name = li.getAttribute("name");
+                    x.children = []
+
+                    let newUl = (li.querySelector('ul'));
+
+                    if (newUl) {
+                        x.children.push(getLiFromUl(newUl, x))
+                    }
+                    children.push(x);
+                })
+
+                return children
+
+            }
+
+
+            let ul = jsTreeObject.domSelector.tree.querySelector("ul");
+            let x = getLiFromUl(ul);
+          
+            return x
         },
 
-        buildTree: function (data, tree, searchField) {
+
+        buildTree: function (data, tree) {
             let ul = document.createElement("ul");
 
             data.children.forEach(function (child) {
@@ -327,8 +358,9 @@ var jsTree = (function () {
                 }
 
             });
-
+          
             tree.appendChild(ul);
+            
 
         }
     }
@@ -338,15 +370,20 @@ var jsTree = (function () {
 
             jsTreeObject.domSelector.searchField = searchField;
             jsTreeObject.bindEvent();
-            jsTreeObject.buildTree(data, tree, searchField);
+            jsTreeObject.domSelector.tree = tree
+            jsTreeObject.buildTree(data, tree);
+
 
         },
-        getSelectedNodes: function(tree){
-            return jsTreeObject.getSelectedNodes(tree);
+        getSelectedNodes: function () {
+            return jsTreeObject.getSelectedNodes();
+        },
+        getUpdatedDataFromDOM: function () {
+            return jsTreeObject.getUpdatedDataFromDOM();
         }
 
     }
-})();
+});
 
 
 
